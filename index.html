@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIA 1 – User Directory</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161920;
+      --surface2: #1e2230;
+      --border: #2a2f3e;
+      --accent: #4f8ef7;
+      --accent2: #38c9a0;
+      --text: #e8eaf0;
+      --muted: #7a8099;
+      --you-bg: #1a2a1f;
+      --you-border: #38c9a0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+
+    header {
+      max-width: 1000px;
+      margin: 0 auto 40px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      background: var(--accent);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .card {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #f4655a; }
+    .dot.yellow { background: #f4c244; }
+    .dot.green { background: #54c464; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    thead th {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 14px 20px;
+      text-align: left;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 13px 20px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .td-id {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .td-name { font-weight: 500; }
+
+    .td-username {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .td-email {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .td-zip {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+    }
+
+    tr.you-row {
+      background: var(--you-bg) !important;
+      border-left: 3px solid var(--you-border);
+    }
+
+    tr.you-row:hover { background: #1f3325 !important; }
+
+    .you-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      background: var(--accent2);
+      color: #0d0f14;
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-left: 8px;
+      vertical-align: middle;
+      letter-spacing: 0.06em;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .stat-bar {
+      max-width: 1000px;
+      margin: 0 auto 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 22px;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .stat-value.blue { color: var(--accent); }
+    .stat-value.green { color: var(--accent2); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">SIA 1 – System Integration & Architecture</div>
+  <h1>User <span>Directory</span></h1>
+  <p class="subtitle">Fetched from jsonplaceholder.typicode.com/users · Personal entry highlighted</p>
+</header>
+
+<div class="stat-bar">
+  <div class="stat">
+    <div class="stat-label">Total Users</div>
+    <div class="stat-value blue" id="stat-total">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">API Users</div>
+    <div class="stat-value" id="stat-api">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">My Entry</div>
+    <div class="stat-value green">1</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="dot red"></div>
+    <div class="dot yellow"></div>
+    <div class="dot green"></div>
+  </div>
+  <div class="table-wrap">
+    <div id="loading">
+      <span class="spinner"></span> Fetching data from API…
+    </div>
+    <table id="user-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Zipcode</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const MY_DATA = {
+    id: "00",
+    firstName: "Debie Heart",
+    lastName: "Belinario",
+    username: "dhbelinario",
+    email: "debieheart.belinario@nmsc.edu.ph",
+    zipcode: "7025"
+  };
+
+  function makeRow(rowNum, id, firstName, lastName, username, email, zipcode, isMe) {
+    const tr = document.createElement("tr");
+    if (isMe) tr.className = "you-row";
+    tr.innerHTML = `
+      <td class="td-id">${rowNum}</td>
+      <td class="td-id">${id}</td>
+      <td class="td-name">${firstName}${isMe ? '<span class="you-badge">YOU</span>' : ''}</td>
+      <td>${lastName}</td>
+      <td class="td-username">@${username}</td>
+      <td class="td-email">${email}</td>
+      <td class="td-zip">${zipcode}</td>
+    `;
+    return tr;
+  }
+
+  async function loadUsers() {
+    try {
+      const res = await fetch("https://jsonplaceholder.typicode.com/users");
+      const users = await res.json();
+
+      const tbody = document.getElementById("tbody");
+
+      // Row 1: personal entry
+      tbody.appendChild(makeRow(1, MY_DATA.id, MY_DATA.firstName, MY_DATA.lastName, MY_DATA.username, MY_DATA.email, MY_DATA.zipcode, true));
+
+      // API rows
+      users.forEach((u, i) => {
+        const nameParts = u.name.split(" ");
+        const firstName = nameParts[0] || u.name;
+        const lastName = nameParts.slice(1).join(" ") || "—";
+        tbody.appendChild(makeRow(i + 2, u.id, firstName, lastName, u.username, u.email, u.address?.zipcode || "N/A", false));
+      });
+
+      document.getElementById("stat-total").textContent = users.length + 1;
+      document.getElementById("stat-api").textContent = users.length;
+
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("user-table").style.display = "table";
+    } catch (err) {
+      document.getElementById("loading").innerHTML = "⚠ Failed to load API data. Check your connection.";
+    }
+  }
+
+  loadUsers();
+</script>
+</body>
+</html>
